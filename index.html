@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>For My Dearest Shreya ✨ Happy Belated Birthday</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Confetti Canvas Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --primary-pink: #ff8fa3;
+      --soft-pink: #fff0f3;
+      --deep-rose: #c9184a;
+      --rose-dark: #800f2f;
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --card-border: rgba(255, 255, 255, 0.9);
+      --text-main: #4a2835;
+      --text-muted: #7d5a68;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      background: radial-gradient(circle at 10% 20%, #ffe3e8 0%, #ffd1dc 45%, #fcd5ce 80%, #fbe4e8 100%);
+      font-family: 'Montserrat', sans-serif;
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Falling Petals Background */
+    #petals-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ========================================================
+       ONE-BY-ONE 22 BALLOONS OPENING OVERLAY
+       ======================================================== */
+    #balloon-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: radial-gradient(circle at center, #fff0f3 0%, #ffd1dc 55%, #ffb3c1 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 30px 20px 40px;
+      overflow: hidden;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    #balloon-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.05);
+    }
+
+    .gate-header {
+      text-align: center;
+      z-index: 10;
+    }
+
+    .gate-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 6vw, 2.4rem);
+      color: var(--rose-dark);
+      margin-bottom: 4px;
+    }
+
+    .gate-header p {
+      font-size: 0.92rem;
+      color: #591d32;
+    }
+
+    /* Progress Bar */
+    .progress-wrap {
+      width: 220px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 10px;
+      margin: 12px auto 6px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 4.5%;
+      background: linear-gradient(90deg, #ff758f, #c9184a);
+      border-radius: 10px;
+      transition: width 0.3s ease;
+    }
+
+    .balloon-counter-badge {
+      display: inline-block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--deep-rose);
+      background: white;
+      padding: 4px 16px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(201, 24, 74, 0.15);
+      margin-top: 4px;
+    }
+
+    /* Single Floating Stage */
+    .single-balloon-stage {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .balloon-wrapper {
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: floatBreath 2.8s infinite ease-in-out alternate;
+    }
+
+    .balloon-body {
+      width: 140px;
+      height: 175px;
+      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+      position: relative;
+      box-shadow: inset -10px -10px 24px rgba(0,0,0,0.18), 0 16px 30px rgba(128, 15, 47, 0.2);
+      transition: transform 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-family: 'Caveat', cursive;
+      font-size: 2.2rem;
+      font-weight: bold;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .balloon-body::before {
+      content: '';
+      position: absolute;
+      top: 25px;
+      left: 25px;
+      width: 25px;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.65);
+      border-radius: 50%;
+      transform: rotate(-38deg);
+    }
+
+    .balloon-knot {
+      width: 14px;
+      height: 8px;
+      background: inherit;
+      border-radius: 3px;
+      margin-top: -2px;
+      filter: brightness(0.85);
+    }
+
+    .balloon-string {
+      width: 2px;
+      height: 65px;
+      background: rgba(120, 100, 110, 0.45);
+      position: relative;
+    }
+
+    @keyframes floatBreath {
+      0% { transform: translateY(0px) rotate(-2deg); }
+      100% { transform: translateY(-16px) rotate(2deg); }
+    }
+
+    .pop-out {
+      animation: popBurst 0.22s forwards ease-out !important;
+      pointer-events: none;
+    }
+
+    @keyframes popBurst {
+      0% { transform: scale(1); opacity: 1; }
+      40% { transform: scale(1.35); opacity: 0.8; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    .spawn-in {
+      animation: spawnBalloon 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes spawnBalloon {
+      0% { transform: scale(0.2) translateY(50px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .balloon-reason-note {
+      font-family: 'Caveat', cursive;
+      font-size: 1.55rem;
+      color: #591d32;
+      text-align: center;
+      margin-top: 15px;
+      max-width: 300px;
+      min-height: 40px;
+      transition: opacity 0.2s ease;
+    }
+
+    .tap-hint-pill {
+      font-size: 0.82rem;
+      color: var(--deep-rose);
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-top: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ========================================================
+       MAIN WEBSITE CONTENT
+       ======================================================== */
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 20px 18px 80px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Music Control Pill */
+    .music-widget {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      padding: 8px 14px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(201, 24, 74, 0.16);
+    }
+
+    .music-btn {
+      background: var(--deep-rose);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .music-text {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--deep-rose);
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px 5px 20px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid #ffccd5;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--deep-rose);
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.3rem, 7.5vw, 3.6rem);
+      line-height: 1.15;
+      color: #591d32;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      font-family: 'Caveat', cursive;
+      color: var(--deep-rose);
+      font-size: 1.25em;
+      display: inline-block;
+    }
+
+    /* ========================================================
+       SPOTLIGHT HERO IMAGE (image1.jpg)
+       ======================================================== */
+    .birthday-girl-spotlight {
+      margin: 10px auto 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .spotlight-frame {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      padding: 6px;
+      background: linear-gradient(135deg, #ff758f, #ffb3c1, #dfb15b, #ff758f);
+      box-shadow: 0 12px 30px rgba(201, 24, 74, 0.28), 0 0 25px rgba(255, 143, 163, 0.4);
+      position: relative;
+      animation: pulseGlow 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 12px 30px rgba(201, 24, 74, 0.28), 0 0 20px rgba(255, 143, 163, 0.3); }
+      100% { box-shadow: 0 14px 38px rgba(201, 24, 74, 0.38), 0 0 32px rgba(223, 177, 91, 0.45); }
+    }
+
+    .spotlight-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      display: block;
+    }
+
+    .spotlight-caption {
+      font-family: 'Caveat', cursive;
+      font-size: 1.6rem;
+      color: var(--rose-dark);
+      margin-top: 14px;
+      text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
+    }
+
+    .hero-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.15rem, 4.5vw, 1.45rem);
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 480px;
+      margin-bottom: 25px;
+    }
+
+    .scroll-down-btn {
+      background: #ffffff;
+      color: var(--deep-rose);
+      border: 1.5px solid #ffb3c1;
+      padding: 13px 28px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 40px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(255, 143, 163, 0.35);
+    }
+
+    /* Cards */
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 26px 20px;
+      box-shadow: 0 12px 30px rgba(214, 114, 137, 0.12);
+      margin-top: 30px;
+    }
+
+    .section-title {
+      text-align: center;
+      margin: 45px 0 20px;
+    }
+
+    .section-title h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      color: #591d32;
+    }
+
+    .section-title p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Interactive Candle Cake */
+    .cake-box {
+      text-align: center;
+      padding: 30px 18px;
+    }
+
+    .cake-svg {
+      width: 130px;
+      height: 130px;
+      margin: 0 auto 15px;
+      display: block;
+      cursor: pointer;
+    }
+
+    .flame {
+      transform-origin: center bottom;
+      animation: flicker 1.2s infinite alternate ease-in-out;
+      transition: opacity 0.4s ease;
+    }
+
+    @keyframes flicker {
+      0% { transform: scale(1) rotate(-3deg); opacity: 0.9; }
+      100% { transform: scale(1.18) rotate(3deg); opacity: 1; filter: drop-shadow(0 0 10px #ffba08); }
+    }
+
+    .flame.extinguished {
+      opacity: 0 !important;
+      animation: none !important;
+    }
+
+    .cake-instruction {
+      font-size: 0.92rem;
+      color: var(--deep-rose);
+      font-weight: 600;
+      padding: 8px 14px;
+      background: #ffe3e8;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .cake-wish-msg {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.5s ease;
+      font-family: 'Caveat', cursive;
+      font-size: 1.55rem;
+      color: var(--rose-dark);
+      line-height: 1.4;
+    }
+
+    .cake-wish-msg.revealed {
+      opacity: 1;
+      max-height: 160px;
+      margin-top: 14px;
+    }
+
+    /* Romantic Letter Envelope */
+    .envelope-wrap {
+      cursor: pointer;
+      background: #ffffff;
+      border: 1px solid #ffd1dc;
+      border-radius: 20px;
+      padding: 30px 20px;
+      box-shadow: 0 14px 35px rgba(201, 24, 74, 0.1);
+      text-align: center;
+    }
+
+    .wax-seal {
+      width: 62px;
+      height: 62px;
+      background: radial-gradient(circle, #c9184a 40%, #800f2f 100%);
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 24px;
+      box-shadow: 0 5px 15px rgba(128, 15, 47, 0.3);
+      border: 2px dashed rgba(255, 255, 255, 0.6);
+    }
+
+    .letter-preview-hint {
+      font-family: 'Caveat', cursive;
+      font-size: 1.45rem;
+      color: var(--deep-rose);
+    }
+
+    .letter-content {
+      display: none;
+      text-align: left;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px dashed #ffb3c1;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .letter-content p {
+      font-size: 0.98rem;
+      line-height: 1.8;
+      color: #4a2835;
+      margin-bottom: 16px;
+    }
+
+    .letter-content .belated-highlight {
+      background: #fff0f3;
+      border-left: 3px solid var(--deep-rose);
+      padding: 12px 14px;
+      font-style: italic;
+      border-radius: 0 10px 10px 0;
+      margin: 18px 0;
+      font-size: 1rem;
+    }
+
+    .signature {
+      font-family: 'Caveat', cursive;
+      font-size: 1.85rem;
+      color: var(--deep-rose);
+      text-align: right;
+      margin-top: 20px;
+    }
+
+    /* Mobile Polaroid Gallery for image2, image3, image4 */
+    .polaroid-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      margin-top: 15px;
+    }
+
+    .polaroid {
+      background: #ffffff;
+      padding: 14px 14px 20px;
+      border-radius: 10px;
+      box-shadow: 0 8px 22px rgba(90, 20, 40, 0.08);
+      text-align: center;
+    }
+
+    .polaroid-img-wrapper {
+      width: 100%;
+      height: 250px;
+      overflow: hidden;
+      border-radius: 6px;
+      background: #fae1dd;
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .polaroid-caption {
+      font-family: 'Caveat', cursive;
+      font-size: 1.4rem;
+      color: #591d32;
+      margin-top: 12px;
+    }
+
+    /* Reasons Section */
+    .reasons-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 15px;
+    }
+
+    @media (min-width: 500px) {
+      .reasons-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .reason-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 18px 16px;
+      border: 1px solid rgba(255, 204, 213, 0.6);
+      text-align: left;
+    }
+
+    .reason-num {
+      font-family: 'Caveat', cursive;
+      font-size: 1.6rem;
+      color: var(--deep-rose);
+    }
+
+    .reason-card h4 {
+      font-size: 1rem;
+      margin: 4px 0 6px;
+      color: #591d32;
+    }
+
+    .reason-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Bottom Confetti Button */
+    .surprise-action-box {
+      text-align: center;
+      margin: 45px 0 20px;
+    }
+
+    .sparkle-btn {
+      background: linear-gradient(135deg, #ff758f 0%, #ff4d6d 100%);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 40px;
+      cursor: pointer;
+      width: 90%;
+      max-width: 320px;
+      box-shadow: 0 10px 25px rgba(255, 77, 109, 0.35);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 10px 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Ambient Petals Canvas -->
+  <canvas id="petals-canvas"></canvas>
+
+  <!-- ========================================================
+       ONE-BY-ONE 22 BALLOONS OVERLAY
+       ======================================================== -->
+  <div id="balloon-overlay">
+    <div class="gate-header">
+      <h2>For My Shreya ✨</h2>
+      <p>Burst each balloon one by one to reveal your surprise</p>
+      
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="balloon-counter-badge" id="counterBadge">Balloon 1 of 22</div>
+    </div>
+
+    <!-- Active Single Balloon Area -->
+    <div class="single-balloon-stage">
+      <div class="balloon-wrapper spawn-in" id="currentBalloonWrap">
+        <div class="balloon-body" id="balloonShape">
+          <span id="balloonInnerNum">1</span>
+        </div>
+        <div class="balloon-knot" id="balloonKnot"></div>
+        <div class="balloon-string"></div>
+      </div>
+
+      <div class="balloon-reason-note" id="balloonReasonText">
+        "1. For that smile that brightens my darkest days..."
+      </div>
+
+      <div class="tap-hint-pill">🎈 Tap the balloon to pop! 🎈</div>
+    </div>
+  </div>
+
+  <!-- Music Pill -->
+  <div class="music-widget">
+    <button class="music-btn" id="musicToggleBtn" aria-label="Toggle Birthday Piano">▶</button>
+    <span class="music-text" id="musicLabel">Birthday Piano</span>
+  </div>
+
+  <!-- ========================================================
+       MAIN WEBSITE CONTENT
+       ======================================================== -->
+  <div class="container" id="mainWebsite">
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="badge">A Thoughtful Belated Surprise</div>
+      <h1> Happy Birthday, The Most Beautiful Girl In The World <br/><span>Shreya</span> 🌸</h1>
+
+      <!-- EXTRA FEATURED IMAGE (image1.jpg) -->
+      <div class="birthday-girl-spotlight">
+        <div class="spotlight-frame">
+          <img 
+            src="image1.jpeg" 
+            alt="My Dearest Shreya" 
+            class="spotlight-img"
+            onerror="this.onerror=null; this.src='image1.jpeg';"
+          />
+        </div>
+        <div class="spotlight-caption">The Birthday Girl • My Shreya (Misti) ✨</div>
+      </div>
+
+      <p class="hero-subtitle">
+        "*Today, the world became a little more beautiful because you were born, and my world became brighter because you’re in it. Welcome to this little corner of the universe, filled with love, dreams, and pieces of my heart—all created to celebrate the most beautiful part of my world. Happy Birthday, Shreya. 💗✨🌙*"
+      </p>
+
+      <a href="#letterSection" class="scroll-down-btn">
+        Open My Letter &darr;
+      </a>
+    </section>
+
+    <!-- Candle & Cake Section -->
+    <div class="glass-card cake-box">
+      <h3 style="font-family:'Cormorant Garamond', serif; font-size:1.7rem; color:#591d32; margin-bottom: 6px;">
+        Make A Secret Wish
+      </h3>
+      <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 18px;">
+        Close your eyes, whisper your wish, and tap the candle flame.
+      </p>
+
+      <svg class="cake-svg" id="candleCake" viewBox="0 0 100 100" fill="none">
+        <rect x="20" y="55" width="60" height="30" rx="4" fill="#ffccd5"/>
+        <rect x="25" y="40" width="50" height="18" rx="3" fill="#ffb3c1"/>
+        <path d="M20 58 Q 28 65 35 58 Q 43 65 50 58 Q 58 65 65 58 Q 72 65 80 58" stroke="#ffffff" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M25 43 Q 32 48 37 43 Q 45 48 50 43 Q 57 48 63 43 Q 70 48 75 43" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <rect x="47" y="24" width="6" height="17" rx="1.5" fill="#fff" stroke="#ff758f" stroke-width="1"/>
+        <line x1="50" y1="24" x2="50" y2="20" stroke="#4a2835" stroke-width="1.2"/>
+        <path id="candleFlame" class="flame" d="M50 8 C46 14, 45 17, 50 21 C55 17, 54 14, 50 8 Z" fill="#ff9e00"/>
+      </svg>
+
+      <div>
+        <div class="cake-instruction" id="candleHint">✨ Tap the flame to blow it out ✨</div>
+      </div>
+      <div class="cake-wish-msg" id="cakeWishMsg">
+        🎉 May every dream you whispered come true, Shreya. I promise to be right there cheering for you every step of the way!
+      </div>
+    </div>
+
+    <!-- The Love Letter -->
+    <section id="letterSection" style="margin-top: 40px;">
+      <div class="section-title">
+        <h2>Written For You</h2>
+        <p>Tap the wax seal below to read</p>
+      </div>
+
+      <div class="envelope-wrap" id="letterEnvelope">
+        <div class="wax-seal" id="waxSeal">💌</div>
+        <div class="letter-preview-hint" id="letterPrompt">Tap to open my letter</div>
+
+        <div class="letter-content" id="letterBody">
+          <p><strong>My Dearest Shreya, 💖🥹🦋🌸</strong></p>
+
+          <p>
+            Today is incredibly special to me because it’s the day the world was blessed with you—my reason to smile, my peace of mind, my closest person, and one of the most beautiful feelings in my life. 🫶🏻❤️✨ You’re not just my girlfriend; you’re my best friend, my person to share everything with, my partner in all my craziness, and the sweetest comfort on my hardest days. 🥹💗🧸 Even the smallest moments spent with you mean so much to me. So, on your birthday, I want you to laugh freely, enjoy every moment your own way, and always remember that there’s someone in this world to whom you are incredibly, incredibly special. 🎂🎀💝🌷
+          </p>
+
+          <p>
+            You know, the little moments I spend with you are the most beautiful ones to me. Your smile, your craziness, our little arguments, and the way we forget everything and start talking again—I love every bit of it. 🥹💕🌷 Having you in my life makes even ordinary days feel extraordinary. I always want to be the reason behind your smile on your sad days and stand beside you during every happy moment of your life. 🫂❤️🌙
+          </p>
+
+          <p>
+            Happy Birthday, my little crazy girl! 🎉🎂💋 I might never find enough words to explain just how special you are to me. All I want is to see you smile like this on many more birthdays, keep loving you, and create countless beautiful memories with you. 🥹💗🌹 Never change, my love—stay a little crazy, a little stubborn, incredibly sweet, and forever my favourite person! 🤭🎀❤️
+          </p>
+
+          <p>
+            I love you so, so much, my Shreya. Today, tomorrow, and in every tomorrow that follows—stay by my side, and I’ll always try my best to stay by yours. 💖🫂♾️😘
+          </p>
+
+          <div class="signature">
+            Forever yours Puchku,<br/>
+            With all my love ❤️
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Polaroid Memories Section (image2.jpg, image3.jpg, image4.jpg) -->
+    <section>
+      <div class="section-title">
+        <h2>Snapshots Of Us</h2>
+        <p>Precious memories with you</p>
+      </div>
+
+      <div class="polaroid-grid">
+        <!-- Photo 2 -->
+        <div class="polaroid">
+          <div class="polaroid-img-wrapper">
+            <img 
+              src="image2.jpeg" 
+              alt="Memory 2"
+              onerror="this.onerror=null; this.src='image2.jpeg';"
+            />
+          </div>
+          <div class="polaroid-caption">Your unforgettable smile 🌸</div>
+        </div>
+
+        <!-- Photo 3 -->
+        <div class="polaroid">
+          <div class="polaroid-img-wrapper">
+            <img 
+              src="image3.jpeg" 
+              alt="Memory 3"
+              onerror="this.onerror=null; this.src='image3.jpeg';"
+            />
+          </div>
+          <div class="polaroid-caption">Where time stood still ✨</div>
+        </div>
+
+        <!-- Photo 4 -->
+        <div class="polaroid">
+          <div class="polaroid-img-wrapper">
+            <img 
+              src="image4.jpeg" 
+              alt="Memory 4"
+              onerror="this.onerror=null; this.src='image4.jpeg';"
+            />
+          </div>
+          <div class="polaroid-caption">Every second with you is magic 💖</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reasons Grid -->
+    <section>
+      <div class="section-title">
+        <h2>Why You Mean The World</h2>
+        <p>A few little things I cherish about Shreya</p>
+      </div>
+
+      <div class="reasons-grid">
+        <div class="reason-card">
+          <div class="reason-num">01</div>
+          <h4>Your Warmth</h4>
+          <p>No matter how tiring life gets, your voice immediately puts my heart at ease.</p>
+        </div>
+        <div class="reason-card">
+          <div class="reason-num">02</div>
+          <h4>Your Beautiful Laugh</h4>
+          <p>The pure, spontaneous way you laugh is hands down my favorite melody in the world.</p>
+        </div>
+        <div class="reason-card">
+          <div class="reason-num">03</div>
+          <h4>Your Caring Soul</h4>
+          <p>The genuine empathy and sweetness you show to everyone around you inspires me daily.</p>
+        </div>
+        <div class="reason-card">
+          <div class="reason-num">04</div>
+          <h4>You Are My Home</h4>
+          <p>With you, I never have to pretend. Being beside you is exactly where I belong.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Shower Love Button -->
+    <div class="surprise-action-box">
+      <button class="sparkle-btn" id="confettiShowerBtn">
+        ✨ Shower Shreya With Love ✨
+      </button>
+    </div>
+
+    <footer>
+      Crafted with pure love & devotion for Shreya • Belated Birthday 2026
+    </footer>
+
+  </div>
+
+  <script>
+    /* ========================================================
+       1. WEB AUDIO API: REALISTIC POP SOUND + BIRTHDAY PIANO
+       ======================================================== */
+    let audioCtx = null;
+    let isMusicPlaying = false;
+    let birthdayTimeout = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Realistic, Crisp Balloon Burst Synthesizer
+    function playClearBalloonPop() {
+      initAudio();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+
+      // Layer 1: High-frequency explosive air snap (White noise burst)
+      const bufferSize = audioCtx.sampleRate * 0.05; // 50ms
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.18));
+      }
+
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1400, now);
+      filter.Q.setValueAtTime(1.2, now);
+
+      const noiseGain = audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(1.2, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+
+      noise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(audioCtx.destination);
+      noise.start(now);
+
+      // Layer 2: Rubber membrane pop (Low-mid thump)
+      const osc = audioCtx.createOscillator();
+      const oscGain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(35, now + 0.07);
+
+      oscGain.gain.setValueAtTime(0.9, now);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+
+      osc.connect(oscGain);
+      oscGain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.07);
+    }
+
+    // Romantic Birthday Piano Tone
+    function playPianoKey(freq, duration) {
+      if (!audioCtx || !isMusicPlaying) return;
+      const now = audioCtx.currentTime;
+
+      const osc1 = audioCtx.createOscillator();
+      const gain1 = audioCtx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(freq, now);
+
+      const osc2 = audioCtx.createOscillator();
+      const gain2 = audioCtx.createGain();
+      osc2.type = 'triangle';
+      osc2.frequency.setValueAtTime(freq * 2, now);
+
+      gain1.gain.setValueAtTime(0, now);
+      gain1.gain.linearRampToValueAtTime(0.25, now + 0.02);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, now + (duration / 1000));
+
+      gain2.gain.setValueAtTime(0, now);
+      gain2.gain.linearRampToValueAtTime(0.08, now + 0.02);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, now + (duration / 1000) * 0.7);
+
+      osc1.connect(gain1);
+      gain1.connect(audioCtx.destination);
+
+      osc2.connect(gain2);
+      gain2.connect(audioCtx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + (duration / 1000));
+      osc2.stop(now + (duration / 1000));
+    }
+
+    // "HAPPY BIRTHDAY TO YOU" Piano Score
+    const P = {
+      G3: 196.00, C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23,
+      G4: 392.00, A4: 440.00, B4: 493.88, C5: 523.25, D5: 587.33,
+      E5: 659.25, F5: 698.46, G5: 783.99
+    };
+
+    const birthdayMelody = [
+      { note: P.G4, dur: 360 }, { note: P.G4, dur: 220 }, { note: P.A4, dur: 580 },
+      { note: P.G4, dur: 580 }, { note: P.C5, dur: 580 }, { note: P.B4, dur: 1100 },
+      { note: P.G4, dur: 360 }, { note: P.G4, dur: 220 }, { note: P.A4, dur: 580 },
+      { note: P.G4, dur: 580 }, { note: P.D5, dur: 580 }, { note: P.C5, dur: 1100 },
+      { note: P.G4, dur: 360 }, { note: P.G4, dur: 220 }, { note: P.G5, dur: 600 },
+      { note: P.E5, dur: 600 }, { note: P.C5, dur: 600 }, { note: P.B4, dur: 600 },
+      { note: P.A4, dur: 1000 },
+      { note: P.F5, dur: 360 }, { note: P.F5, dur: 220 }, { note: P.E5, dur: 600 },
+      { note: P.C5, dur: 600 }, { note: P.D5, dur: 600 }, { note: P.C5, dur: 1400 }
+    ];
+
+    let bDayIndex = 0;
+
+    function playBirthdayLoop() {
+      if (!isMusicPlaying) return;
+      const step = birthdayMelody[bDayIndex];
+      playPianoKey(step.note, step.dur);
+
+      bDayIndex = (bDayIndex + 1) % birthdayMelody.length;
+      birthdayTimeout = setTimeout(playBirthdayLoop, step.dur + 60);
+    }
+
+    const musicBtn = document.getElementById('musicToggleBtn');
+    const musicLabel = document.getElementById('musicLabel');
+
+    function startBirthdayMusic() {
+      initAudio();
+      isMusicPlaying = true;
+      musicBtn.textContent = '⏸';
+      musicLabel.textContent = 'Birthday Piano 🎶';
+      playBirthdayLoop();
+    }
+
+    musicBtn.addEventListener('click', () => {
+      initAudio();
+      if (isMusicPlaying) {
+        isMusicPlaying = false;
+        clearTimeout(birthdayTimeout);
+        musicBtn.textContent = '▶';
+        musicLabel.textContent = 'Birthday Piano';
+      } else {
+        startBirthdayMusic();
+      }
+    });
+
+    /* ========================================================
+       2. 22 BALLOONS APPEARING ONE-BY-ONE ENGINE
+       ======================================================== */
+    const balloonColors = [
+      '#ff4d6d', '#ff758f', '#ff8fa3', '#a2d2ff', '#bde0fe',
+      '#cdb4db', '#ffc8dd', '#ffafcc', '#ffd166', '#06d6a0',
+      '#f72585', '#7209b7', '#4cc9f0', '#ff9e00', '#f48c06',
+      '#e0aaff', '#c77dff', '#9d4edd', '#80ed99', '#57cc99',
+      '#ff5d8f', '#e7c6ff'
+    ];
+
+    const balloonReasons = [
+      "1. For that smile that brightens my darkest days 🌸",
+      "2. For the gentle kindness you carry everywhere ✨",
+      "3. For the sound of your pure, contagious laugh 💖",
+      "4. For the warmth you give whenever you hold my hand 🕊️",
+      "5. For always understanding me without saying a word 💫",
+      "6. For your adorable little quirks that melt my heart 🎀",
+      "7. For your quiet strength and inspiring grace 🌷",
+      "8. For making every ordinary moment feel special 🌟",
+      "9. For being my safe haven and calm in every storm 🏡",
+      "10. For the patience and care you show so effortlessly 💕",
+      "11. For the sparkle in your eyes when you're happy ✨",
+      "12. For making my life a hundred times sweeter 🍰",
+      "13. For listening to my rambling stories with love 🌙",
+      "14. For your big, beautiful, compassionate heart 💛",
+      "15. For every shared memory we hold so close 📸",
+      "16. For being my best friend and my true love 🌹",
+      "17. For the sweetness in your voice every day 🎶",
+      "18. For always believing in me, even when I don't 💌",
+      "19. For simply being unapologetically you 🌸",
+      "20. For all the adventures yet to come with you 🗺️",
+      "21. For being the wish I make every single night 🌠",
+      "22. Because I love you endlessly, today & forever! ❤️"
+    ];
+
+    let currentBalloonIndex = 1;
+    const totalBalloons = 22;
+
+    const currentBalloonWrap = document.getElementById('currentBalloonWrap');
+    const balloonShape = document.getElementById('balloonShape');
+    const balloonKnot = document.getElementById('balloonKnot');
+    const balloonInnerNum = document.getElementById('balloonInnerNum');
+    const balloonReasonText = document.getElementById('balloonReasonText');
+    const counterBadge = document.getElementById('counterBadge');
+    const progressBar = document.getElementById('progressBar');
+    const overlay = document.getElementById('balloon-overlay');
+
+    function applyBalloonStyle(index) {
+      const color = balloonColors[(index - 1) % balloonColors.length];
+      balloonShape.style.backgroundColor = color;
+      balloonKnot.style.backgroundColor = color;
+      balloonInnerNum.textContent = index;
+      balloonReasonText.textContent = balloonReasons[index - 1];
+      counterBadge.textContent = `Balloon ${index} of ${totalBalloons}`;
+      progressBar.style.width = `${(index / totalBalloons) * 100}%`;
+    }
+
+    applyBalloonStyle(1);
+
+    currentBalloonWrap.addEventListener('pointerdown', function(e) {
+      e.stopPropagation();
+
+      playClearBalloonPop();
+
+      currentBalloonWrap.classList.add('pop-out');
+
+      const rect = currentBalloonWrap.getBoundingClientRect();
+      confetti({
+        particleCount: 22,
+        spread: 60,
+        origin: {
+          x: (rect.left + rect.width / 2) / window.innerWidth,
+          y: (rect.top + rect.height / 2) / window.innerHeight
+        },
+        colors: [balloonColors[(currentBalloonIndex - 1) % balloonColors.length], '#ffffff', '#ffd166']
+      });
+
+      if (currentBalloonIndex < totalBalloons) {
+        currentBalloonIndex++;
+        setTimeout(() => {
+          applyBalloonStyle(currentBalloonIndex);
+          currentBalloonWrap.classList.remove('pop-out');
+          currentBalloonWrap.classList.add('spawn-in');
+          setTimeout(() => currentBalloonWrap.classList.remove('spawn-in'), 400);
+        }, 220);
+      } else {
+        setTimeout(finishOpeningGate, 350);
+      }
+    });
+
+    function finishOpeningGate() {
+      confetti({
+        particleCount: 120,
+        spread: 90,
+        origin: { y: 0.5 },
+        colors: ['#ff4d6d', '#ffccd5', '#ffd166', '#bde0fe', '#ffffff']
+      });
+
+      overlay.classList.add('hidden');
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 800);
+
+      startBirthdayMusic();
+    }
+
+    /* ========================================================
+       3. AMBIENT PETALS (Optimized for Mobile)
+       ======================================================== */
+    const canvas = document.getElementById('petals-canvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const petalCount = 20;
+    const petals = [];
+
+    class Petal {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * -height;
+        this.size = Math.random() * 7 + 5;
+        this.speedY = Math.random() * 1.1 + 0.7;
+        this.speedX = Math.random() * 0.8 - 0.4;
+        this.angle = Math.random() * 360;
+        this.rotationSpeed = Math.random() * 1.4 - 0.7;
+        this.opacity = Math.random() * 0.35 + 0.25;
+        this.color = Math.random() > 0.5 ? '#ffb3c1' : '#ffccd5';
+      }
+      update() {
+        this.y += this.speedY;
+        this.x += Math.sin(this.angle * Math.PI / 180) * 0.6 + this.speedX;
+        this.angle += this.rotationSpeed;
+        if (this.y > height + 20) {
+          this.reset();
+          this.y = -10;
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate((this.angle * Math.PI) / 180);
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.opacity;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < petalCount; i++) {
+      petals.push(new Petal());
+    }
+
+    function animatePetals() {
+      ctx.clearRect(0, 0, width, height);
+      petals.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animatePetals);
+    }
+    animatePetals();
+
+    /* ========================================================
+       4. INTERACTIVE CANDLE BLOWING
+       ======================================================== */
+    const candleCake = document.getElementById('candleCake');
+    const candleFlame = document.getElementById('candleFlame');
+    const candleHint = document.getElementById('candleHint');
+    const cakeWishMsg = document.getElementById('cakeWishMsg');
+    let candleBlown = false;
+
+    function blowCandle() {
+      if (candleBlown) return;
+      candleBlown = true;
+      candleFlame.classList.add('extinguished');
+      candleHint.style.display = 'none';
+      cakeWishMsg.classList.add('revealed');
+
+      confetti({
+        particleCount: 65,
+        spread: 60,
+        origin: { y: 0.6 },
+        colors: ['#ff8fa3', '#ffccd5', '#ffd166', '#ffffff']
+      });
+    }
+
+    candleCake.addEventListener('click', blowCandle);
+    candleHint.addEventListener('click', blowCandle);
+
+    /* ========================================================
+       5. ENVELOPE LOVE LETTER REVEAL
+       ======================================================== */
+    const envelope = document.getElementById('letterEnvelope');
+    const letterBody = document.getElementById('letterBody');
+    const letterPrompt = document.getElementById('letterPrompt');
+    const waxSeal = document.getElementById('waxSeal');
+    let isEnvelopeOpen = false;
+
+    envelope.addEventListener('click', () => {
+      if (!isEnvelopeOpen) {
+        letterBody.style.display = 'block';
+        letterPrompt.textContent = "Sealed with my forever love ✨";
+        waxSeal.textContent = "💖";
+        isEnvelopeOpen = true;
+
+        confetti({
+          particleCount: 50,
+          spread: 65,
+          origin: { y: 0.7 },
+          colors: ['#ff4d6d', '#ff8fa3', '#ffffff']
+        });
+      }
+    });
+
+    /* ========================================================
+       6. SHOWER LOVE BUTTON
+       ======================================================== */
+    document.getElementById('confettiShowerBtn').addEventListener('click', () => {
+      const end = Date.now() + 1800;
+      const colors = ['#ff758f', '#ffccd5', '#dfb15b', '#ffffff'];
+
+      (function frame() {
+        confetti({
+          particleCount: 4,
+          angle: 60,
+          spread: 50,
+          origin: { x: 0 },
+          colors: colors
+        });
+        confetti({
+          particleCount: 4,
+          angle: 120,
+          spread: 50,
+          origin: { x: 1 },
+          colors: colors
+        });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      })();
+    });
+  </script>
+</body>
+</html>
